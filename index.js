@@ -1,8 +1,6 @@
 /**
  * Created by tom on 01/08/16.
  */
-
-
 const spawn = require('child_process').spawn;
 const exec = require('child_process').exec;
 const fs = require('fs');
@@ -39,7 +37,6 @@ function compile(code, board) {
         if (error) {
             console.error('exec error: ${error}');
         } else {
-          console.log('ln -s ' + refPath + 'platformio.ini ' + path + 'platformio.ini');
             async.parallel([
                 fs.appendFile.bind(null, path + 'src/main.ino', code),
                 exec.bind(null, 'ln -s ' + refPath + 'platformio.ini ' + path + 'platformio.ini'),
@@ -48,8 +45,15 @@ function compile(code, board) {
                 if (error) {
                     console.error('exec error: ${error}');
                 } else {
-                    console.log(path);
-                    pioRun=spawn('pio', ['run', '-e', board, '-d', path]);
+                    var pio = spawn('pio', ['run', '-e', board, '-d', path]);
+                    pio.on('close', function(exitCode){
+                        console.log('child process exited with code', exitCode);
+                        fs.readFile(path+'.pioenvs/'+board+'/firmware.hex', 'utf8', function(err, contents) {
+
+                        console.log(contents);   //"contents" contains the hex string
+
+                        });
+                    });
                 }
             });
         }
