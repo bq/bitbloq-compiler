@@ -84,6 +84,7 @@ app.post('/compile', function(req, res) {
 
 function compile(code, board, done) {
     var hex;
+    var compileError = [];
     var path = basePath + 'pioWS_' + Date.now() + '/';
     exec('mkdir -p ' + path + 'src', function(error, stdout, stderr) {
         if (error) {
@@ -96,27 +97,34 @@ function compile(code, board, done) {
             ], function(err, result) {
                 if (err) {
                     console.error('exec error: ${error}');
-                    done(err);
                 } else {
                     var pio = spawn('pio', ['run', '-e', board, '-d', path]);
-                    pio.on('close', function(exitCode) {
-                        console.log('child process exited with code', exitCode);
-                        fs.readFile(path + '.pioenvs/' + board + '/firmware.hex', 'utf8', function(err, contents) {
-                            hex = contents;
-                            done(err, hex);
-                            exec('rm -r ' + path, function(error, stdout, stderr) {
-                                if (error) {
-                                    console.error('exec error: ${error}');
-                                }
-                            });
-                        });
-                    });
-
                     pio.stderr.on('data', function(data) {
-                        console.log('stderr:', data.toString('utf8'));
+                        compileError.push(data.toString('utf8'));
+                    });
+                    pio.on('close', function(exitCode) {
+                        if (exitCode === 0){
+                            fs.readFile(path + '.pioenvs/' + board + '/firmware.hex', 'utf8', function(err, contents) {
+                              hex = contents;
+                              done(err, hex);  //aquí yo quitaría el "err" y pondría un código de éxito o true
+                              deletePath(path);
+                            });
+                          }else{
+                              console.log(compileError);
+                              done(compileError);
+                              deletePath(path);
+                          }
                     });
                 }
             });
+        }
+    });
+}
+
+function deletePath(path){
+    exec('rm -r '+ path, function(error, stdout, stderr){
+        if (error) {
+            console.error('exec error: ${error}');
         }
     });
 }
