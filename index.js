@@ -4,14 +4,16 @@
 const spawn = require('child_process').spawn;
 const exec = require('child_process').exec;
 const fs = require('fs');
+const crypto = require('crypto');
 var async = require('async');
 var express = require('express');
 var app = express();
 var bodyParser = require('body-parser');
+//var MongoClient = require('mongodb').MongoClient;
+var db = require('./db');
+const secret = 'oedjfgjkncfcijimpmgebklamobdioeg';
 
-var pioRun = [];
 
-var i;
 var basePath = '/home/platformio/';
 var refPath = basePath + 'pioWS/';
 
@@ -26,9 +28,53 @@ app.use(allowCrossDomain);
 app.use(bodyParser.json());
 
 app.post('/compile', function(req, res) {
-    var hex = compile(req.body.code, req.body.board, function(err, hex) {
-        res.send(hex);
+
+
+    var miniCode = req.body.code.replace(/(\r\n|\n|\r)/gm, '');
+    var hash = crypto.createHmac('sha256', secret)
+        .update(miniCode)
+        .digest('hex');
+
+    console.log("Connected correctly to server");
+    console.log("req.body.board");
+    console.log(req.body.board);
+    var collection = db.get().collection(req.body.board);
+
+    collection.findOne({
+        _id: hash
+    }, {}, function(err, doc) {
+        if (err) {
+            console.log(err.message);
+        } else if (doc) {
+            console.log("doc");
+            console.log(doc);
+            res.send(doc.value);
+
+        } else {
+            var hex = compile(req.body.code, req.body.board, function(err, hex) {
+                res.send(hex);
+                collection.update({
+                        _id: hash,
+                    }, {
+                        $set: {
+                            value: hex,
+                            createdAt: new Date()
+                        }
+                    }, {
+                        upsert: true
+                    },
+                    function(err, result) {
+                        if (err) {
+                            console.log(err);
+                        } else {}
+
+                    });
+            });
+        }
     });
+    /*  var hex = compile(req.body.code, req.body.board, function(err, hex) {
+          res.send(hex);
+      });*/
 });
 
 
@@ -68,6 +114,13 @@ function compile(code, board, done) {
 }
 
 
-app.listen(3000, function() {
-    console.log('Example app listening on port 3000!');
+db.connect('mongodb://10.181.100.142:27017/hex', function(err) {
+    if (err) {
+        console.log('Unable to connect to Mongo.');
+        process.exit(1);
+    } else {
+        app.listen(3000, function() {
+            console.log('Listening on port 3000...');
+        });
+    }
 });
