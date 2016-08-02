@@ -52,23 +52,27 @@ app.post('/compile', function(req, res) {
 
         } else {
             var hex = compile(req.body.code, req.body.board, function(err, hex) {
-                res.send(hex);
-                collection.update({
-                        _id: hash,
-                    }, {
-                        $set: {
-                            value: hex,
-                            createdAt: new Date()
-                        }
-                    }, {
-                        upsert: true
-                    },
-                    function(err, result) {
-                        if (err) {
-                            console.log(err);
-                        } else {}
+                if (err) {
+                    res.send(err);
+                } else {
+                    res.send(hex);
+                    collection.update({
+                            _id: hash,
+                        }, {
+                            $set: {
+                                value: hex,
+                                createdAt: new Date()
+                            }
+                        }, {
+                            upsert: true
+                        },
+                        function(err, result) {
+                            if (err) {
+                                console.log(err);
+                            } else {}
 
-                    });
+                        });
+                }
             });
         }
     });
@@ -106,6 +110,10 @@ function compile(code, board, done) {
                                 }
                             });
                         });
+                    });
+
+                    pio.stderr.on('data', function(data) {
+                        console.log('stderr:', data.toString('utf8'));
                     });
                 }
             });
