@@ -1,0 +1,69 @@
+  A new SCons release, 2.4.1, is now available
+  on the SCons download page:
+
+          http://www.scons.org/download.php
+
+    Here is a summary of the changes since 2.4.0:
+
+  NEW FUNCTIONALITY
+    - InstallVersionedLib now available in the DefaultEnvironment context.
+    - Added new configure check, CheckProg, to check for existence of a program.
+    - Add support `Microsoft Visual C++ Compiler for Python 2.7' 
+      Compiler can be obtained at: https://www.microsoft.com/en-us/download/details.aspx?id=44266
+
+  DEPRECATED FUNCTIONALITY
+
+  CHANGED/ENHANCED EXISTING FUNCTIONALITY
+
+    - Reimplemented versioning for shared libraries, with the following effects
+    - Fixed tigris issues #3001, #3006.
+    - Fixed several other issues not reported to tigris, including:
+      issues with versioned libraries in subdirectories with tricky names,
+      issues with versioned libraries and variant directories,
+      issue with soname not being injected to library when using D linkers,
+    - Switched to direct symlinks instead of daisy-chained ones -- soname and
+      development symlinks point directly to the versioned shared library now),
+      for rationale see:
+      https://www.debian.org/doc/debian-policy/ch-sharedlibs.html
+      https://fedoraproject.org/wiki/Packaging:Guidelines#Devel_Packages
+      https://bitbucket.org/scons/scons/pull-requests/247/new-versioned-libraries-gnulink-cyglink/diff#comment-10063929
+    - New construction variables to allow override default behavior: SONAME,
+      SHLIBVERSIONFLAGS, _SHLIBVERSIONFLAGS, SHLIBNOVERSIONSYMLINKS,
+      LDMODULEVERSION, LDMODULEVERSIONFLAGS, _LDMODULEVERSIONFLAGS,
+      LDMODULENOVERSIONSYMLINKS.
+    - Changed logic used to configure the versioning machinery from
+      platform-centric to linker-oriented.
+    - The SHLIBVERSION/LDMODULEVERSION variables are no longer validated by
+      SCons (more freedom to users).
+    - InstallVersionedLib() doesn't use SHLIBVERSION anymore.
+    - Enchanced docs for the library versioning stuff.
+    - New tests for versioned libraries.
+    - Library versioning is currently implemented for the following linker
+      tools: 'cyglink', 'gnulink', 'sunlink'.
+
+  FIXES
+
+    - Fix for issue #2840 - Fix for two environments specifying same target with different
+      actions not throwing hard error. Instead SCons was incorrectly issuing a warning
+      and continuing.
+    - Fix to swig tool - pick-up 'swig', 'swig3.0' and 'swig2.0' (in order).
+    - Fix to swig tool - respect env['SWIG'] provided by user.
+    - Fix for Bug # 2791 - Setup.py fails unnecessarily under Jython.
+    - Fixed license of SVG titlepage files in the context of Debian
+      packaging, such that they allow for commercial use too (#2985).
+    - Fixed tigris issue #3011: Glob() excludes didn't work when used with VariantDir(duplicate=0)
+    - Fix bug 2831 and allow Help() text to be appended to AddOption() help.
+
+  IMPROVEMENTS
+
+  PACKAGING
+
+  DOCUMENTATION
+
+  DEVELOPMENT
+
+  Thanks to Arfrever Frehtes Taifersar Arahesis, Dirk Baechle, William Blevins, Carnë Draug, Andrew Featherstone, Hiroaki Itoh, Florian Miedniak, William Roberts, Paweł Tomulik  for their contributions to this release.
+  Contributors are listed alphabetically by their last name.
+
+Copyright (c) 2001 - 2015 The SCons Foundation
+src/RELEASE.txt rel_2.4.1:3453:73fefd3ea0b0 2015/11/09 03:25:05 bdbaddog
