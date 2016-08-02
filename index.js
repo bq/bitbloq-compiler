@@ -55,6 +55,11 @@ function compile(code, board, done) {
                             hex = contents;
                             done(err, hex);
                         });
+                        exec('rm -r '+ path, function(error, stdout, stderr){
+                          if (error) {
+                            console.error('exec error: ${error}');
+                          }
+                        });
                     });
                 }
             });
