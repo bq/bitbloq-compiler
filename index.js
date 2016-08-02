@@ -54,11 +54,11 @@ function compile(code, board, done) {
                         fs.readFile(path + '.pioenvs/' + board + '/firmware.hex', 'utf8', function(err, contents) {
                             hex = contents;
                             done(err, hex);
-                        });
-                        exec('rm -r '+ path, function(error, stdout, stderr){
-                          if (error) {
-                            console.error('exec error: ${error}');
-                          }
+                            exec('rm -r ' + path, function(error, stdout, stderr) {
+                                if (error) {
+                                    console.error('exec error: ${error}');
+                                }
+                            });
                         });
                     });
                 }
