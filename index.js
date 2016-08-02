@@ -26,12 +26,14 @@ app.use(allowCrossDomain);
 app.use(bodyParser.json());
 
 app.post('/compile', function(req, res) {
-    compile(req.body.code, req.body.board);
-    res.send('Got a POST request');
+    var hex = compile(req.body.code, req.body.board, function(err, hex) {
+        res.send(hex);
+    });
 });
 
 
-function compile(code, board) {
+function compile(code, board, done) {
+    var hex;
     var path = basePath + 'pioWS_' + Date.now() + '/';
     exec('mkdir -p ' + path + 'src', function(error, stdout, stderr) {
         if (error) {
@@ -42,16 +44,16 @@ function compile(code, board) {
                 exec.bind(null, 'ln -s ' + refPath + 'platformio.ini ' + path + 'platformio.ini'),
                 exec.bind(null, 'ln -s ' + refPath + 'lib/ ' + path + 'lib')
             ], function(err, result) {
-                if (error) {
+                if (err) {
                     console.error('exec error: ${error}');
+                    done(err);
                 } else {
                     var pio = spawn('pio', ['run', '-e', board, '-d', path]);
-                    pio.on('close', function(exitCode){
+                    pio.on('close', function(exitCode) {
                         console.log('child process exited with code', exitCode);
-                        fs.readFile(path+'.pioenvs/'+board+'/firmware.hex', 'utf8', function(err, contents) {
-
-                        console.log(contents);   //"contents" contains the hex string
-
+                        fs.readFile(path + '.pioenvs/' + board + '/firmware.hex', 'utf8', function(err, contents) {
+                            hex = contents;
+                            done(err, hex);
                         });
                     });
                 }
