@@ -9,13 +9,11 @@ var async = require('async');
 var express = require('express');
 var app = express();
 var bodyParser = require('body-parser');
-//var MongoClient = require('mongodb').MongoClient;
+var config = require('res/config.js');
 var db = require('./db');
-const secret = 'oedjfgjkncfcijimpmgebklamobdioeg';
 
 
-var basePath = '/home/platformio/';
-var refPath = basePath + 'pioWS/';
+var refPath = config.basePath + 'pioWS/';
 
 var allowCrossDomain = function(req, res, next) {
     res.header('Access-Control-Allow-Origin', '*');
@@ -31,13 +29,12 @@ app.post('/compile', function(req, res) {
 
 
     var miniCode = req.body.code.replace(/(\r\n|\n|\r)/gm, '');
-    var hash = crypto.createHmac('sha256', secret)
+    var hash = crypto.createHmac('sha256', config.secret)
         .update(miniCode)
         .digest('hex');
 
     console.log("Connected correctly to server");
-    console.log("req.body.board");
-    console.log(req.body.board);
+
     var collection = db.get().collection(req.body.board);
 
     collection.findOne({
@@ -76,15 +73,12 @@ app.post('/compile', function(req, res) {
             });
         }
     });
-    /*  var hex = compile(req.body.code, req.body.board, function(err, hex) {
-          res.send(hex);
-      });*/
 });
 
 
 function compile(code, board, done) {
     var hex;
-    var path = basePath + 'pioWS_' + Date.now() + '/';
+    var path = config.basePath + 'pioWS_' + Date.now() + '/';
     exec('mkdir -p ' + path + 'src', function(error, stdout, stderr) {
         if (error) {
             console.error('exec error: ${error}');
@@ -122,12 +116,12 @@ function compile(code, board, done) {
 }
 
 
-db.connect('mongodb://10.181.100.142:27017/hex', function(err) {
+db.connect(config.mongo.uri, function(err) {
     if (err) {
         console.log('Unable to connect to Mongo.');
         process.exit(1);
     } else {
-        app.listen(3000, function() {
+        app.listen(config.port, function() {
             console.log('Listening on port 3000...');
         });
     }
