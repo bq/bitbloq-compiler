@@ -11,6 +11,7 @@ var app = express();
 var bodyParser = require('body-parser');
 var config = require('./res/config.js');
 var db = require('./db');
+var errParser = require('./errorParser.js');
 
 
 var refPath = config.basePath + 'pioWS/';
@@ -95,7 +96,7 @@ function compile(code, board, done) {
                 } else {
                     var pio = spawn('pio', ['run', '-e', board, '-d', path]);
                     pio.stderr.on('data', function(data) {
-                        compileError.push(data.toString('utf8'));
+                        compileError = compileError.concat(errParser.parseError(data.toString('utf8')));
                     });
                     pio.on('close', function(exitCode) {
                         if (exitCode === 0){
