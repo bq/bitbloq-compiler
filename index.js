@@ -9,7 +9,7 @@ var async = require('async');
 var express = require('express');
 var app = express();
 var bodyParser = require('body-parser');
-var config = require('res/config.js');
+var config = require('./res/config.js');
 var db = require('./db');
 
 
