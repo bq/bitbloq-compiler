@@ -46,14 +46,14 @@ app.post('/compile', function(req, res) {
         } else if (doc) {
             console.log("doc");
             console.log(doc);
-            res.send(doc.value);
+            res.send({hex: doc.value});
 
         } else {
             var hex = compile(req.body.code, req.body.board, function(err, hex) {
                 if (err) {
-                    res.send(err);
+                    res.send({error: err} );
                 } else {
-                    res.send(hex);
+                    res.send({hex: hex});
                     collection.update({
                             _id: hash,
                         }, {
