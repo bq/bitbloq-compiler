@@ -102,7 +102,7 @@ function compile(code, board, done) {
                         if (exitCode === 0){
                             fs.readFile(path + '.pioenvs/' + board + '/firmware.hex', 'utf8', function(err, contents) {
                               hex = contents;
-                              done(err, hex);  //aquí yo quitaría el "err" y pondría un código de éxito o true
+                              done(null, hex);
                               deletePath(path);
                             });
                           }else{
