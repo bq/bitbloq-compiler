@@ -1,4 +1,3 @@
-
 var compErrRegex = /(.*):([0-9]+):([0-9]+): (fatal error|error): (.*)/;
 var refErrRegex = /(.*):([0-9]+): (.*)/;
 
@@ -18,21 +17,18 @@ function parseRefError(errorParts){
     error['line'] = errorParts[2];
     error['error'] = errorParts[3].replace(/\\/g,"");
     return error;
-  }
+}
 
-
-// Function that you should call to parse the errors in the string returned
+// Function you should call to parse the errors in the string returned
 // by platformio
 function parseError(errorStr){
     var errors = [];
     var errorParts = [];
     var lines = errorStr.split('\n');
-    for (var i=0; i < lines.length; i++){
-
+    for (var i=0; i<lines.length; i++){
         if ( (errorParts = lines[i].match(compErrRegex)) != null ){
           errors.push(parseCompError(errorParts));
         }
-
         else if ( (errorParts = lines[i].match(refErrRegex)) != null ){
           errors.push(parseRefError(errorParts));
         }
