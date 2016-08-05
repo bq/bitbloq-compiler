@@ -3,19 +3,21 @@ var refErrRegex = /(.*):([0-9]+): (.*)/;
 
 // Auxiliar functions
 function parseCompError(errorParts){
-    var error = {};
-    error['file'] = errorParts[1];
-    error['line'] = errorParts[2];
-    error['column'] = errorParts[3];
-    error['error'] = errorParts[5].replace(/\\/g,"");
+    var error = {
+        'file': errorParts[1],
+        'line': errorParts[2],
+        'column': errorParts[3],
+        'error': errorParts[5].replace(/\\/g,"")
+    };
     return error;
 }
 
 function parseRefError(errorParts){
-    var error = {};
-    error['file'] = errorParts[1];
-    error['line'] = errorParts[2];
-    error['error'] = errorParts[3].replace(/\\/g,"");
+    var error = {
+        'file': errorParts[1],
+        'line': errorParts[2],
+        'error': errorParts[3].replace(/\\/g,"")
+    };
     return error;
 }
 
