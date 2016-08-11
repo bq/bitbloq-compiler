@@ -28,8 +28,8 @@ app.use(allowCrossDomain);
 app.use(bodyParser.json());
 
 app.post('/compile', function(req, res) {
-
     if (req.body.code && req.body.board) {
+      console.log(utils.checkBoardType(req.body.board));
         if (utils.checkBoardType(req.body.board)) {
             var miniCode = req.body.code.replace(/(\r\n|\n|\r)/gm, '');
             var hash = crypto.createHmac('sha256', config.secret)
@@ -83,10 +83,10 @@ app.post('/compile', function(req, res) {
                 }
             });
         } else {
-            res.sendStatus(400);
+            res.status(400).send('No compatible type of board');
         }
     } else {
-        res.sendStatus(400);
+        res.status(400).send('Missing board or code');
     }
 });
 
