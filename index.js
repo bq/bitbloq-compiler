@@ -48,18 +48,18 @@ app.post('/compile', function(req, res) {
                 } else if (doc) {
                     console.log("doc");
                     console.log(doc);
-                    res.send({
+                    res.status(200).send({
                         hex: doc.value
                     });
 
                 } else {
                     var hex = compile(req.body.code, req.body.board, function(err, hex) {
                         if (err) {
-                            res.send({
+                            res.status(200).send({
                                 error: err
                             });
                         } else {
-                            res.send({
+                            res.status(200).send({
                                 hex: hex
                             });
                             collection.update({
