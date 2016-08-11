@@ -12,6 +12,7 @@ var bodyParser = require('body-parser');
 var config = require('./res/config.js');
 var db = require('./db');
 var errParser = require('./errorParser.js');
+var utils = require('./utils.js');
 
 
 var refPath = config.basePath + 'pioWS/';
@@ -28,52 +29,65 @@ app.use(bodyParser.json());
 
 app.post('/compile', function(req, res) {
 
+    if (req.body.code && req.body.board) {
+        if (utils.checkBoardType(req.body.board)) {
+            var miniCode = req.body.code.replace(/(\r\n|\n|\r)/gm, '');
+            var hash = crypto.createHmac('sha256', config.secret)
+                .update(miniCode)
+                .digest('hex');
 
-    var miniCode = req.body.code.replace(/(\r\n|\n|\r)/gm, '');
-    var hash = crypto.createHmac('sha256', config.secret)
-        .update(miniCode)
-        .digest('hex');
+            console.log("Connected correctly to server");
 
-    console.log("Connected correctly to server");
+            var collection = db.get().collection(req.body.board);
 
-    var collection = db.get().collection(req.body.board);
-
-    collection.findOne({
-        _id: hash
-    }, {}, function(err, doc) {
-        if (err) {
-            console.log(err.message);
-        } else if (doc) {
-            console.log("doc");
-            console.log(doc);
-            res.send({hex: doc.value});
-
-        } else {
-            var hex = compile(req.body.code, req.body.board, function(err, hex) {
+            collection.findOne({
+                _id: hash
+            }, {}, function(err, doc) {
                 if (err) {
-                    res.send({error: err} );
-                } else {
-                    res.send({hex: hex});
-                    collection.update({
-                            _id: hash,
-                        }, {
-                            $set: {
-                                value: hex,
-                                createdAt: new Date()
-                            }
-                        }, {
-                            upsert: true
-                        },
-                        function(err, result) {
-                            if (err) {
-                                console.log(err);
-                            } else {}
+                    console.log(err.message);
+                } else if (doc) {
+                    console.log("doc");
+                    console.log(doc);
+                    res.send({
+                        hex: doc.value
+                    });
 
-                        });
+                } else {
+                    var hex = compile(req.body.code, req.body.board, function(err, hex) {
+                        if (err) {
+                            res.send({
+                                error: err
+                            });
+                        } else {
+                            res.send({
+                                hex: hex
+                            });
+                            collection.update({
+                                    _id: hash,
+                                }, {
+                                    $set: {
+                                        value: hex,
+                                        createdAt: new Date()
+                                    }
+                                }, {
+                                    upsert: true
+                                },
+                                function(err, result) {
+                                    if (err) {
+                                        console.log(err);
+                                    } else {}
+
+                                });
+                        }
+                    });
                 }
             });
+        } else {
+            res.sendStatus(400);
         }
-    });
+    } else {
+        res.sendStatus(400);
+    }
 });
 
 
@@ -99,17 +113,17 @@ function compile(code, board, done) {
                         compileError = compileError.concat(errParser.parseError(data.toString('utf8')));
                     });
                     pio.on('close', function(exitCode) {
-                        if (exitCode === 0){
+                        if (exitCode === 0) {
                             fs.readFile(path + '.pioenvs/' + board + '/firmware.hex', 'utf8', function(err, contents) {
-                              hex = contents;
-                              done(null, hex);
-                              deletePath(path);
+                                hex = contents;
+                                done(null, hex);
+                                deletePath(path);
                             });
-                          }else{
-                              console.log(compileError);
-                              done(compileError);
-                              deletePath(path);
-                          }
+                        } else {
+                            console.log(compileError);
+                            done(compileError);
+                            deletePath(path);
+                        }
                     });
                 }
             });
@@ -117,8 +131,8 @@ function compile(code, board, done) {
     });
 }
 
-function deletePath(path){
-    exec('rm -r '+ path, function(error, stdout, stderr){
+function deletePath(path) {
+    exec('rm -r ' + path, function(error, stdout, stderr) {
         if (error) {
             console.error('exec error: ${error}');
         }
