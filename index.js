@@ -93,9 +93,8 @@ app.post('/compile', function(req, res) {
 
 function compile(code, board, done) {
     var hex;
-    var path = config.basePath + 'pioWS_' + Date.now() + '/';
-    var compileError = [];
-
+    var path = config.basePath + 'pioWS_' + Date.now() + Math.floor(Math.random() * (100 - 0 + 1) + 0) + '/';
+    var compileErrors = [];
     exec('mkdir -p ' + path + 'src', function(error, stdout, stderr) {
         if (error) {
             console.error('exec error: ${error}');
@@ -110,7 +109,11 @@ function compile(code, board, done) {
                 } else {
                     var pio = spawn('pio', ['run', '-e', board, '-d', path]);
                     pio.stderr.on('data', function(data) {
-                        compileError = compileError.concat(errParser.parseError(data.toString('utf8')));
+                        console.log(data);
+                        compErr = errParser.parseError(data.toString('utf8'));
+                        if (compErr !== []){
+                          compileErrors = compileErrors.concat(compErr);
+                        }
                     });
                     pio.on('close', function(exitCode) {
                         if (exitCode === 0) {
@@ -120,8 +123,9 @@ function compile(code, board, done) {
                                 deletePath(path);
                             });
                         } else {
-                            console.log(compileError);
-                            done(compileError);
+                            console.log('exit code:',exitCode);
+                            console.log(compileErrors);
+                            done(compileErrors);
                             deletePath(path);
                         }
                     });
