@@ -37,6 +37,22 @@ app.post('/compile', function(req, res) {
                 .digest('hex');
 
             console.log("Connected correctly to server");
+
+            var collection = db.get().collection(req.body.board);
+
+            collection.findOne({
+                _id: hash
+            }, {}, function(err, doc) {
+                if (err) {
+                    console.log(err.message);
+                } else if (doc) {
+                    console.log("doc");
+                    console.log(doc);
+                    res.status(200).json({
+                        hex: doc.value
+                    });
+
+                } else {
                     var hex = compile(req.body.code, req.body.board, function(err, hex) {
                         if (err) {
                             res.status(200).json({
@@ -46,8 +62,26 @@ app.post('/compile', function(req, res) {
                             res.send({
                                 hex: hex
                             });
+                            collection.update({
+                                    _id: hash,
+                                }, {
+                                    $set: {
+                                        value: hex,
+                                        createdAt: new Date()
+                                    }
+                                }, {
+                                    upsert: true
+                                },
+                                function(err, result) {
+                                    if (err) {
+                                        console.log(err);
+                                    } else {}
+
+                                });
                         }
                     });
+                }
+            });
         } else {
             res.status(400).send('No compatible type of board');
         }
