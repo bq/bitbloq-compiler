@@ -93,7 +93,7 @@ app.post('/compile', function(req, res) {
 
 function compile(code, board, done) {
     var hex;
-    var path = config.basePath + 'pioWS_' + Date.now() + '/';
+    var path = config.basePath + 'pioWS_' + Date.now() + Math.floor(Math.random() * (100 - 0 + 1) + 0) + '/';
     var compileError = [];
 
     exec('mkdir -p ' + path + 'src', function(error, stdout, stderr) {
