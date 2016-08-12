@@ -29,15 +29,56 @@ app.use(bodyParser.json());
 
 app.post('/compile', function(req, res) {
     if (req.body.code && req.body.board) {
+      console.log(utils.checkBoardType(req.body.board));
         if (utils.checkBoardType(req.body.board)) {
-            var hex = compile(req.body.code, req.body.board, function(err, hex) {
+            var miniCode = req.body.code.replace(/(\r\n|\n|\r)/gm, '');
+            var hash = crypto.createHmac('sha256', config.secret)
+                .update(miniCode)
+                .digest('hex');
+
+            console.log("Connected correctly to server");
+
+            var collection = db.get().collection(req.body.board);
+
+            collection.findOne({
+                _id: hash
+            }, {}, function(err, doc) {
                 if (err) {
+                    console.log(err.message);
+                } else if (doc) {
+                    console.log("doc");
+                    console.log(doc);
                     res.status(200).json({
-                        error: err
+                        hex: doc.value
                     });
+
                 } else {
-                    res.send({
-                        hex: hex
+                    var hex = compile(req.body.code, req.body.board, function(err, hex) {
+                        if (err) {
+                            res.status(200).json({
+                                error: err
+                            });
+                        } else {
+                            res.send({
+                                hex: hex
+                            });
+                            collection.update({
+                                    _id: hash,
+                                }, {
+                                    $set: {
+                                        value: hex,
+                                        createdAt: new Date()
+                                    }
+                                }, {
+                                    upsert: true
+                                },
+                                function(err, result) {
+                                    if (err) {
+                                        console.log(err);
+                                    } else {}
+
+                                });
+                        }
                     });
                 }
             });
@@ -52,7 +93,7 @@ app.post('/compile', function(req, res) {
 
 function compile(code, board, done) {
     var hex;
-    var path = config.basePath + 'pioWS_' + Date.now() + Math.floor(Math.random() * (100 - 0 + 1) + 0) + '/';
+    var path = config.basePath + 'pioWS_' + Date.now() + '/';
     var compileError = [];
 
     exec('mkdir -p ' + path + 'src', function(error, stdout, stderr) {
