@@ -13,7 +13,7 @@ var config = require('./res/config.js');
 var db = require('./db');
 var errParser = require('./errorParser.js');
 var utils = require('./utils.js');
-
+var timeout = require('connect-timeout'); //express v4
 
 var refPath = config.basePath + 'pioWS/';
 
@@ -26,9 +26,15 @@ var allowCrossDomain = function(req, res, next) {
 
 app.use(allowCrossDomain);
 app.use(bodyParser.json());
+app.use(timeout(30000));
+app.use(haltOnTimedout);
+
+function haltOnTimedout(req, res, next){
+  console.log("entro");
+  if (!req.timedout) next();
+}
 
 app.post('/compile', function(req, res) {
-   setTimeout(function(){ console.log("DIIIIING"); }, 30000);
     console.log("req.body.number is : ", req.body.number);
     if (req.body.code && req.body.board) {
         console.log(utils.checkBoardType(req.body.board));
