@@ -13,6 +13,7 @@ var config = require('./res/config.js');
 var db = require('./db');
 var errParser = require('./errorParser.js');
 var utils = require('./utils.js');
+var io = require('socket.io')(http);
 
 
 var refPath = config.basePath + 'pioWS/';
@@ -155,3 +156,13 @@ db.connect(config.mongo.uri, function(err) {
         });
     }
 });
+
+// ------------------ Socket -----------------------
+
+io.on('connection', function(socket){
+    console.log('a user connected');
+    socket.on('disconnect', function(){
+        console.log('user disconnected');
+    });
+});
+
