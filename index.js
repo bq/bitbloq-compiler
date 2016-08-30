@@ -54,12 +54,13 @@ app.post('/compile', function(req, res) {
                     });
 
                 } else {
-                    var hex = compile(req.body.code, req.body.board, function(err, hex) {
+                    var hex = compile(req.body.code, req.body.board, req.body.number, function(err, hex) {
                         if (err) {
                             res.status(200).json({
                                 error: err
                             });
                         } else {
+                          console.log("he completado bien la peticion: ", req.body.number);
                             res.send({
                                 hex: hex
                             });
@@ -92,7 +93,7 @@ app.post('/compile', function(req, res) {
 });
 
 
-function compile(code, board, done) {
+function compile(code, board, number, done) {
     var hex;
     var path = config.basePath + 'pioWS_' + Date.now() + Math.floor(Math.random() * (100 - 0 + 1) + 0) + '/';
     var compileErrors = [];
