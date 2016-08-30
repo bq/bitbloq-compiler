@@ -28,6 +28,7 @@ app.use(allowCrossDomain);
 app.use(bodyParser.json());
 
 app.post('/compile', function(req, res) {
+   setTimeout(function(){ console.log("DIIIIING"); }, 30000);
     console.log("req.body.number is : ", req.body.number);
     if (req.body.code && req.body.board) {
         console.log(utils.checkBoardType(req.body.board));
