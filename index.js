@@ -13,6 +13,7 @@ var config = require('./res/config.js');
 var db = require('./db');
 var errParser = require('./errorParser.js');
 var utils = require('./utils.js');
+var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
 
@@ -161,8 +162,13 @@ db.connect(config.mongo.uri, function(err) {
 
 io.on('connection', function(socket){
     console.log('a user connected');
+    
     socket.on('disconnect', function(){
         console.log('user disconnected');
     });
+
+    socket.on('example', function(){
+        console.log('user says "hello"');
+    })
 });
 
