@@ -61,6 +61,7 @@ app.post('/compile', function(req, res) {
                             });
                         } else {
                           console.log("he completado bien la peticion: ", req.body.number);
+                          console.log("a la hora: ", Date.now());
                             res.send({
                                 hex: hex
                             });
@@ -119,6 +120,7 @@ function compile(code, board, number, done) {
                     });
                     pio.on('close', function(exitCode) {
                         if (exitCode === 0) {
+                          console.log("he completado bien la peticion")
                             fs.readFile(path + '.pioenvs/' + board + '/firmware.hex', 'utf8', function(err, contents) {
                                 hex = contents;
                                 done(null, hex);
