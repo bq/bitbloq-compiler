@@ -155,8 +155,9 @@ db.connect(config.mongo.uri, function(err) {
         console.log('Unable to connect to Mongo.');
         process.exit(1);
     } else {
-        app.listen(config.port, function() {
+      var test=  app.listen(config.port, function() {
             console.log('Listening on port 3000...');
         });
+        test.timeout = 12000000;
     }
 });
