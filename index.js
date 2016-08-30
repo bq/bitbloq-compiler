@@ -31,17 +31,23 @@ app.use(bodyParser.json());
 
 app.post('/compile', function(req, res) {
     console.log("req.body.number is : ", req.body.number);
-    if (req.body.code && req.body.board) {
-        console.log(utils.checkBoardType(req.body.board));
-        if (utils.checkBoardType(req.body.board)) {
-            var miniCode = req.body.code.replace(/(\r\n|\n|\r)/gm, '');
+    sendCompiler(req.body.code, req.body.board, function(status, msg) {
+        res.status(status).json(msg);
+    });
+});
+
+function sendCompiler(code, board, next) {
+    if (code && board) {
+        console.log(utils.checkBoardType(board));
+        if (utils.checkBoardType(board)) {
+            var miniCode = code.replace(/(\r\n|\n|\r)/gm, '');
             var hash = crypto.createHmac('sha256', config.secret)
                 .update(miniCode)
                 .digest('hex');
 
             console.log("Connected correctly to server");
 
-            var collection = db.get().collection(req.body.board);
+            var collection = db.get().collection(board);
 
             collection.findOne({
                 _id: hash
@@ -51,22 +57,22 @@ app.post('/compile', function(req, res) {
                 } else if (doc) {
                     console.log("doc");
                     console.log(doc);
-                    res.status(200).json({
+                    next(200, {
                         hex: doc.value
                     });
 
                 } else {
-                    var hex = compile(req.body.code, req.body.board, function(err, hex) {
+                    var hex = compile(code, board, function(err, hex) {
                         if (err) {
-                            res.status(200).json({
+                            next(204, {
                                 error: err
                             });
                         } else {
-                            res.send({
+                            next(200, {
                                 hex: hex
                             });
                             collection.update({
-                                    _id: hash,
+                                    _id: hash
                                 }, {
                                     $set: {
                                         value: hex,
@@ -78,7 +84,8 @@ app.post('/compile', function(req, res) {
                                 function(err, result) {
                                     if (err) {
                                         console.log(err);
-                                    } else {}
+                                    } else {
+                                    }
 
                                 });
                         }
@@ -86,12 +93,12 @@ app.post('/compile', function(req, res) {
                 }
             });
         } else {
-            res.status(400).send('No compatible type of board');
+            next(400, {error: 'No compatible type of board'});
         }
     } else {
-        res.status(400).send('Missing board or code');
+        next(400, {error: 'Missing board or code'});
     }
-});
+}
 
 
 function compile(code, board, done) {
@@ -160,15 +167,21 @@ db.connect(config.mongo.uri, function(err) {
 
 // ------------------ Socket -----------------------
 
-io.on('connection', function(socket){
+io.on('connection', function(socket) {
     console.log('a user connected');
-    
-    socket.on('disconnect', function(){
+
+    socket.on('disconnect', function() {
         console.log('user disconnected');
     });
 
-    socket.on('example', function(){
+    socket.on('example', function() {
         console.log('user says "hello"');
-    })
+    });
+
+    socket.on('compile', function(code, board) {
+        sendCompiler(code, board, function(status, msg) {
+            socket.emit('compiled', {status: status, msg: msg});
+        });
+    });
 });
 
