@@ -114,6 +114,8 @@ function compile(code, board, number, done) {
                         console.log(data);
                         compErr = errParser.parseError(data.toString('utf8'));
                         if (compErr !== []) {
+                            console.log("compErr");
+                            console.log(compErr);
                             compileErrors = compileErrors.concat(compErr);
                         }
                     });
