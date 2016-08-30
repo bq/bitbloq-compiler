@@ -28,8 +28,9 @@ app.use(allowCrossDomain);
 app.use(bodyParser.json());
 
 app.post('/compile', function(req, res) {
+    console.log("req.body.number is : ", req.body.number);
     if (req.body.code && req.body.board) {
-      console.log(utils.checkBoardType(req.body.board));
+        console.log(utils.checkBoardType(req.body.board));
         if (utils.checkBoardType(req.body.board)) {
             var miniCode = req.body.code.replace(/(\r\n|\n|\r)/gm, '');
             var hash = crypto.createHmac('sha256', config.secret)
@@ -111,8 +112,8 @@ function compile(code, board, done) {
                     pio.stderr.on('data', function(data) {
                         console.log(data);
                         compErr = errParser.parseError(data.toString('utf8'));
-                        if (compErr !== []){
-                          compileErrors = compileErrors.concat(compErr);
+                        if (compErr !== []) {
+                            compileErrors = compileErrors.concat(compErr);
                         }
                     });
                     pio.on('close', function(exitCode) {
@@ -123,7 +124,7 @@ function compile(code, board, done) {
                                 deletePath(path);
                             });
                         } else {
-                            console.log('exit code:',exitCode);
+                            console.log('exit code:', exitCode);
                             console.log(compileErrors);
                             done(compileErrors);
                             deletePath(path);
