@@ -121,7 +121,6 @@ function compile(code, board, number, done) {
                     });
                     pio.on('close', function(exitCode) {
                         if (exitCode === 0) {
-                            console.log("he completado bien la peticion");
                             fs.readFile(path + '.pioenvs/' + board + '/firmware.hex', 'utf8', function(err, contents) {
                                 hex = contents;
                                 done(null, hex);
