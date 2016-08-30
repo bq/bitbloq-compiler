@@ -28,6 +28,8 @@ app.use(bodyParser.json());
 
 
 app.post('/compile', function(req, res) {
+    console.log('req: ', req);
+    console.log('req.timedout: ', req.timedout);
     console.log("req.body.number is : ", req.body.number);
     if (req.body.code && req.body.board) {
         console.log(utils.checkBoardType(req.body.board));
@@ -60,8 +62,8 @@ app.post('/compile', function(req, res) {
                                 error: err
                             });
                         } else {
-                          console.log("he completado bien la peticion: ", req.body.number);
-                          console.log("a la hora: ", Date.now());
+                            console.log("he completado bien la peticion: ", req.body.number);
+                            console.log("a la hora: ", Date.now());
                             res.send({
                                 hex: hex
                             });
@@ -120,7 +122,7 @@ function compile(code, board, number, done) {
                     });
                     pio.on('close', function(exitCode) {
                         if (exitCode === 0) {
-                          console.log("he completado bien la peticion")
+                            console.log("he completado bien la peticion")
                             fs.readFile(path + '.pioenvs/' + board + '/firmware.hex', 'utf8', function(err, contents) {
                                 hex = contents;
                                 done(null, hex);
