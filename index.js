@@ -95,7 +95,7 @@ function _compileSession (hash, code, board, number, collection) {
         return promiseMap[hash] = new Promise(function(resolve,reject){
             //exec Compiler
             console.log('mando compilar');
-            compile(code, board, number, function(err, hex) {
+            compile(code, board, function(err, hex) {
                 if (err) {
                     reject(err);
                 } else {
