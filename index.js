@@ -58,7 +58,9 @@ app.post('/compile', function(req, res) {
 
                 } else {
                     _compileSession(hash, req.body.code, req.body.board, collection).then(function(result) {
-                        _sendHex(result.hex);
+                        res.send({
+                            hex: hex
+                        });
                         _updateCompiler(result.hex, result.hash, result.collection, function(err, updateResult) {
                             if (err) {
                                 console.log(err);
@@ -103,12 +105,6 @@ function _compileSession(hash, code, board, collection) {
             });
         });
     }
-}
-
-function _sendHex(hex) {
-    res.send({
-        hex: hex
-    });
 }
 
 function _updateCompiler(hex, hash, collection, next) {
