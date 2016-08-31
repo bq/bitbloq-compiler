@@ -58,11 +58,11 @@ app.post('/compile', function(req, res) {
                         res.send({
                             hex: result.hex
                         });
-                        _updateCompiler(result.hex, result.hash, result.collection, function(err, updateResult) {
+                        _updateCompiler(result.hex, result.hash, result.collection, function(err) {
                             if (err) {
                                 console.log(err);
                             } else {
-                                //delete promiseMap[hash]
+                                delete promiseMap[hash];
                             }
                         });
                     }).catch(function(err) {
