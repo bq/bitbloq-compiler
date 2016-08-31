@@ -59,7 +59,7 @@ app.post('/compile', function(req, res) {
                 } else {
                     _compileSession(hash, req.body.code, req.body.board, collection).then(function(result) {
                         res.send({
-                            hex: hex
+                            hex: result.hex
                         });
                         _updateCompiler(result.hex, result.hash, result.collection, function(err, updateResult) {
                             if (err) {
