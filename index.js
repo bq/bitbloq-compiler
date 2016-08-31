@@ -32,9 +32,6 @@ app.use(bodyParser.json());
 
 
 app.post('/compile', function(req, res) {
-    if(req.body.number) {
-        console.log("req.body.number is : ", req.body.number);
-    }
     if (req.body.code && req.body.board) {
         console.log(utils.checkBoardType(req.body.board));
         if (utils.checkBoardType(req.body.board)) {
@@ -60,7 +57,7 @@ app.post('/compile', function(req, res) {
                     });
 
                 } else {
-                    _compileSession (hash, req.body.code, req.body.board, req.body.number, collection).then(function(result) {
+                    _compileSession(hash, req.body.code, req.body.board, collection).then(function(result) {
                         _sendHex(result.hex);
                         _updateCompiler(result.hex, result.hash, result.collection, function(err, updateResult) {
                             if (err) {
@@ -69,7 +66,7 @@ app.post('/compile', function(req, res) {
                                 //delete promiseMap[hash]
                             }
                         });
-                    }).catch(function(err){
+                    }).catch(function(err) {
                         res.status(200).json({
                             error: err
                         });
@@ -84,27 +81,24 @@ app.post('/compile', function(req, res) {
     }
 });
 
-function _compileSession (hash, code, board, number, collection) {
+function _compileSession(hash, code, board, collection) {
     //find hash promise
     if (promiseMap[hash]) {
         console.log('ya tengo la promesa');
         return promiseMap[hash];
-    }else{
+    } else {
         //create promise
         console.log('nueva promesa');
-        return promiseMap[hash] = new Promise(function(resolve,reject){
+        return promiseMap[hash] = new Promise(function(resolve, reject) {
             //exec Compiler
             console.log('mando compilar');
             compile(code, board, function(err, hex) {
                 if (err) {
                     reject(err);
                 } else {
-                    if(req.body.number) {
-                        console.log("he completado bien la peticion: ", req.body.number);
-                    }
                     //setTimeout(function(){
-                        resolve({hex: hex, hash: hash, collection: collection});
-                   // }, 5000);
+                    resolve({hex: hex, hash: hash, collection: collection});
+                    // }, 5000);
                 }
             });
         });
