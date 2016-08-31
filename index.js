@@ -56,15 +56,6 @@ app.use('/compile', function(req, res) {
                     });
 
                 } else {
-                    var timeout;
-                    var completed;
-                    setTimeout(function() {
-                        if(!completed){
-                          console.log("joooder");
-                          timeout = true;
-                          res.send("nanana");
-                        }
-                    }, 10000);
                     var hex = compile(req.body.code, req.body.board, req.body.number, function(err, hex) {
                         if (err) {
                             res.status(200).json({
@@ -72,28 +63,25 @@ app.use('/compile', function(req, res) {
                             });
                         } else {
                             console.log("he completado bien la peticion: ", req.body.number);
-                            if (!timeout) {
-                                res.send({
-                                    hex: hex
-                                });
-                                collection.update({
-                                        _id: hash,
-                                    }, {
-                                        $set: {
-                                            value: hex,
-                                            createdAt: new Date()
-                                        }
-                                    }, {
-                                        upsert: true
-                                    },
-                                    function(err, result) {
-                                      completed=true;
-                                        if (err) {
-                                            console.log(err);
-                                        } else {}
+                            res.send({
+                                hex: hex
+                            });
+                            collection.update({
+                                    _id: hash,
+                                }, {
+                                    $set: {
+                                        value: hex,
+                                        createdAt: new Date()
+                                    }
+                                }, {
+                                    upsert: true
+                                },
+                                function(err, result) {
+                                    if (err) {
+                                        console.log(err);
+                                    } else {}
 
-                                    });
-                            }
+                                });
                         }
                     });
                 }
