@@ -33,7 +33,6 @@ app.use(bodyParser.json());
 
 app.post('/compile', function(req, res) {
     if (req.body.code && req.body.board) {
-        console.log(utils.checkBoardType(req.body.board));
         if (utils.checkBoardType(req.body.board)) {
             var miniCode = req.body.code.replace(/(\r\n|\n|\r)/gm, '');
             var hash = crypto.createHmac('sha256', config.secret)
@@ -50,8 +49,6 @@ app.post('/compile', function(req, res) {
                 if (err) {
                     console.log(err.message);
                 } else if (doc) {
-                    console.log("doc");
-                    console.log(doc);
                     res.status(200).json({
                         hex: doc.value
                     });
@@ -86,15 +83,12 @@ app.post('/compile', function(req, res) {
 function _compileSession(hash, code, board, collection) {
     //find hash promise
     if (promiseMap[hash]) {
-        console.log('ya tengo la promesa');
         return promiseMap[hash];
     } else {
         //create promise
-        console.log('nueva promesa');
         return promiseMap[hash] = new Promise(function(resolve, reject) {
             //exec Compiler
-            console.log('mando compilar');
-            compile(code, board, function(err, hex) {
+            compile(code, board, hash, function(err, hex) {
                 if (err) {
                     reject(err);
                 } else {
@@ -121,10 +115,9 @@ function _updateCompiler(hex, hash, collection, next) {
 }
 
 
-function compile(code, board, done) {
-    console.log('A COMPILAR!!!!!');
+function compile(code, board, hash, done) {
     var hex;
-    var path = config.basePath + 'pioWS_' + Date.now() + Math.floor(Math.random() * (1000 - 0 + 1) + 0) + '/';
+    var path = config.basePath + 'pioWS_' + hash + '/';
     var compileErrors = [];
     exec('mkdir -p ' + path + 'src', function(error, stdout, stderr) {
         if (error) {
@@ -136,20 +129,14 @@ function compile(code, board, done) {
                 exec.bind(null, 'ln -s ' + refPath + 'platformio.ini ' + path + 'platformio.ini'),
                 exec.bind(null, 'ln -s ' + refPath + 'lib/ ' + path + 'lib')
             ], function(err, result) {
-                console.log('Ha copiado todos los links necesarios main.ino y lib');
                 if (err) {
                     console.error('exec error: ${error}');
                     console.log(error);
                 } else {
                     var pio = spawn('pio', ['run', '-e', board, '-d', path]);
-                    console.log('pio -> ' + pio);
                     pio.stderr.on('data', function(data) {
-                        console.log('pio data ', data);
-                        console.log(data);
                         compErr = errParser.parseError(data.toString('utf8'));
                         if (compErr !== []) {
-                            console.log("compErr");
-                            console.log(compErr);
                             compileErrors = compileErrors.concat(compErr);
                         }
                     });
