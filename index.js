@@ -59,8 +59,8 @@ app.use('/compile', function(req, res) {
                     var timeout;
                     var completed;
                     setTimeout(function() {
-                      console.log("joooder");
                         if(!completed){
+                          console.log("joooder");
                           timeout = true;
                           res.send("nanana");
                         }
