@@ -95,6 +95,7 @@ app.post('/compile', timeout(28000), function(req, res) {
     }
 }, function(error, req, res, next) {
     if (req.timedout) {
+        console.log('timeout!!!');
         res.statusCode = 500;
         res.end('Request timed out');
     } else {
