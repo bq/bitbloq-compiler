@@ -13,6 +13,8 @@ var config = require('./res/config.js');
 var db = require('./db');
 var errParser = require('./errorParser.js');
 var utils = require('./utils.js');
+var timeout = require('connect-timeout');
+
 
 var refPath = config.basePath + 'pioWS/';
 
@@ -27,7 +29,8 @@ app.use(allowCrossDomain);
 app.use(bodyParser.json());
 
 
-app.post('/compile', function(req, res) {
+
+app.post('/compile', timeout(28000), function(req, res) {
     console.log("req.body.number is : ", req.body.number);
     if (req.body.code && req.body.board) {
         console.log(utils.checkBoardType(req.body.board));
@@ -89,6 +92,13 @@ app.post('/compile', function(req, res) {
         }
     } else {
         res.status(400).send('Missing board or code');
+    }
+}, function(error, req, res, next) {
+    if (req.timedout) {
+        res.statusCode = 500;
+        res.end('Request timed out');
+    } else {
+        next(error);
     }
 });
 
