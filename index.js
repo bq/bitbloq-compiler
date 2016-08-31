@@ -29,7 +29,7 @@ app.use(bodyParser.json());
 
 
 
-app.use('/compile', function(req, res) {
+app.post('/compile', function(req, res) {
     console.log("req.body.number is : ", req.body.number);
     if (req.body.code && req.body.board) {
         console.log(utils.checkBoardType(req.body.board));
