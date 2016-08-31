@@ -13,7 +13,6 @@ var config = require('./res/config.js');
 var db = require('./db');
 var errParser = require('./errorParser.js');
 var utils = require('./utils.js');
-var timeout = require('connect-timeout');
 
 
 var refPath = config.basePath + 'pioWS/';
@@ -30,7 +29,7 @@ app.use(bodyParser.json());
 
 
 
-app.post('/compile', timeout(28000), function(req, res) {
+app.use('/compile', function(req, res) {
     console.log("req.body.number is : ", req.body.number);
     if (req.body.code && req.body.board) {
         console.log(utils.checkBoardType(req.body.board));
@@ -57,6 +56,15 @@ app.post('/compile', timeout(28000), function(req, res) {
                     });
 
                 } else {
+                    var timeout;
+                    var completed;
+                    setTimeout(function() {
+                      console.log("joooder");
+                        if(!completed){
+                          timeout = true;
+                          res.send("nanana");
+                        }
+                    }, 10000);
                     var hex = compile(req.body.code, req.body.board, req.body.number, function(err, hex) {
                         if (err) {
                             res.status(200).json({
@@ -64,25 +72,28 @@ app.post('/compile', timeout(28000), function(req, res) {
                             });
                         } else {
                             console.log("he completado bien la peticion: ", req.body.number);
-                            res.send({
-                                hex: hex
-                            });
-                            collection.update({
-                                    _id: hash,
-                                }, {
-                                    $set: {
-                                        value: hex,
-                                        createdAt: new Date()
-                                    }
-                                }, {
-                                    upsert: true
-                                },
-                                function(err, result) {
-                                    if (err) {
-                                        console.log(err);
-                                    } else {}
-
+                            if (!timeout) {
+                                res.send({
+                                    hex: hex
                                 });
+                                collection.update({
+                                        _id: hash,
+                                    }, {
+                                        $set: {
+                                            value: hex,
+                                            createdAt: new Date()
+                                        }
+                                    }, {
+                                        upsert: true
+                                    },
+                                    function(err, result) {
+                                      completed=true;
+                                        if (err) {
+                                            console.log(err);
+                                        } else {}
+
+                                    });
+                            }
                         }
                     });
                 }
@@ -92,14 +103,6 @@ app.post('/compile', timeout(28000), function(req, res) {
         }
     } else {
         res.status(400).send('Missing board or code');
-    }
-}, function(error, req, res, next) {
-    if (req.timedout) {
-        console.log('timeout!!!');
-        res.statusCode = 500;
-        res.end('Request timed out');
-    } else {
-        next(error);
     }
 });
 
