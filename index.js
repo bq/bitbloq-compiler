@@ -92,9 +92,11 @@ function _compileSession(hash, code, board, collection) {
                 if (err) {
                     reject(err);
                 } else {
-                    //setTimeout(function(){
-                    resolve({hex: hex, hash: hash, collection: collection});
-                    // }, 5000);
+                    resolve({
+                        hex: hex,
+                        hash: hash,
+                        collection: collection
+                    });
                 }
             });
         });
