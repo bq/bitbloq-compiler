@@ -126,21 +126,32 @@ function compile(code, board, hash, done) {
             console.error('exec error: ${error}');
             console.log(error);
         } else {
+            console.log(refPath);
+            console.log(path);
             async.parallel([
                 fs.appendFile.bind(null, path + 'src/main.ino', code),
                 exec.bind(null, 'ln -s ' + refPath + 'platformio.ini ' + path + 'platformio.ini'),
                 exec.bind(null, 'ln -s ' + refPath + 'lib/ ' + path + 'lib')
             ], function(err, result) {
                 if (err) {
-                    console.error('exec error: ${error}');
+                    console.error('exec error: ', err);
                     console.log(error);
                 } else {
+                    console.log('hop', 'pio run -e ' + board + ' -d ' + path);
                     var pio = spawn('pio', ['run', '-e', board, '-d', path]);
                     pio.stderr.on('data', function(data) {
+                        console.log('stderror', data.toString('utf8'));
                         compErr = errParser.parseError(data.toString('utf8'));
                         if (compErr !== []) {
                             compileErrors = compileErrors.concat(compErr);
                         }
+                    });
+                    pio.stdout.on('data', function(data) {
+                        console.log('stdout', data.toString('utf8'));
+                    });
+                    pio.on('error', (err) => {
+                        console.log('Failed to start child process.', err);
+                        done(err);
                     });
                     pio.on('close', function(exitCode) {
                         if (exitCode === 0) {
@@ -173,7 +184,7 @@ function deletePath(path) {
 
 db.connect(config.mongo.uri, function(err) {
     if (err) {
-        console.log('Unable to connect to Mongo.');
+        console.log('Unable to connect to Mongo.', err);
         process.exit(1);
     } else {
         app.listen(config.port, function() {
