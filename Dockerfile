@@ -1,7 +1,7 @@
 FROM beevelop/nodejs-python
 MAINTAINER Álvaro Sánchez <alvaro.sanchez@bq.com>
 
-RUN python -c "$(curl -fsSL https://raw.githubusercontent.com/platformio/platformio/v3.0.1/scripts/get-platformio.py)"
+RUN python -c "$(curl -fsSL https://raw.githubusercontent.com/platformio/platformio/master/scripts/get-platformio.py)"
 #RUN rm /usr/local/lib/python2.7/dist-packages/platformio/builder/tools/piomisc.py
 #COPY piomisc.py /usr/local/lib/python2.7/dist-packages/platformio/builder/tools/
 RUN mkdir /home/platformio
