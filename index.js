@@ -1,21 +1,24 @@
 /**
  * Created by tom on 01/08/16.
  */
-const spawn = require('child_process').spawn;
-const exec = require('child_process').exec;
-const fs = require('fs');
-const crypto = require('crypto');
-var async = require('async');
-var express = require('express');
-var app = express();
-var bodyParser = require('body-parser');
-var config = require('./res/config.js');
-var db = require('./db');
-var errParser = require('./errorParser.js');
-var utils = require('./utils.js');
+const spawn = require('child_process').spawn,
+    exec = require('child_process').exec,
+    fs = require('fs'),
+    crypto = require('crypto'),
+    Promise = require('promise');
+
+var async = require('async'),
+    express = require('express'),
+    app = express(),
+    bodyParser = require('body-parser'),
+    config = require('./res/config.js'),
+    db = require('./db'),
+    errParser = require('./errorParser.js'),
+    utils = require('./utils.js');
 
 
-var refPath = config.basePath + 'pioWS/';
+var refPath = config.basePath + 'pioWS/',
+    promiseMap = [];
 
 var allowCrossDomain = function(req, res, next) {
     res.header('Access-Control-Allow-Origin', '*');
@@ -28,11 +31,8 @@ app.use(allowCrossDomain);
 app.use(bodyParser.json());
 
 
-
 app.post('/compile', function(req, res) {
-    console.log("req.body.number is : ", req.body.number);
     if (req.body.code && req.body.board) {
-        console.log(utils.checkBoardType(req.body.board));
         if (utils.checkBoardType(req.body.board)) {
             var miniCode = req.body.code.replace(/(\r\n|\n|\r)/gm, '');
             var hash = crypto.createHmac('sha256', config.secret)
@@ -49,40 +49,26 @@ app.post('/compile', function(req, res) {
                 if (err) {
                     console.log(err.message);
                 } else if (doc) {
-                    console.log("doc");
-                    console.log(doc);
                     res.status(200).json({
                         hex: doc.value
                     });
 
                 } else {
-                    var hex = compile(req.body.code, req.body.board, req.body.number, function(err, hex) {
-                        if (err) {
-                            res.status(200).json({
-                                error: err
-                            });
-                        } else {
-                            console.log("he completado bien la peticion: ", req.body.number);
-                            res.send({
-                                hex: hex
-                            });
-                            collection.update({
-                                    _id: hash,
-                                }, {
-                                    $set: {
-                                        value: hex,
-                                        createdAt: new Date()
-                                    }
-                                }, {
-                                    upsert: true
-                                },
-                                function(err, result) {
-                                    if (err) {
-                                        console.log(err);
-                                    } else {}
-
-                                });
-                        }
+                    _compileSession(hash, req.body.code, req.body.board, collection).then(function(result) {
+                        res.send({
+                            hex: result.hex
+                        });
+                        _updateCompiler(result.hex, result.hash, result.collection, function(err) {
+                            if (err) {
+                                console.log(err);
+                            } else {
+                                delete promiseMap[hash];
+                            }
+                        });
+                    }).catch(function(err) {
+                        res.status(200).json({
+                            error: err
+                        });
                     });
                 }
             });
@@ -94,14 +80,51 @@ app.post('/compile', function(req, res) {
     }
 });
 
+function _compileSession(hash, code, board, collection) {
+    //find hash promise
+    if (promiseMap[hash]) {
+        return promiseMap[hash];
+    } else {
+        //create promise
+        return promiseMap[hash] = new Promise(function(resolve, reject) {
+            //exec Compiler
+            compile(code, board, hash, function(err, hex) {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve({
+                        hex: hex,
+                        hash: hash,
+                        collection: collection
+                    });
+                }
+            });
+        });
+    }
+}
 
-function compile(code, board, number, done) {
+function _updateCompiler(hex, hash, collection, next) {
+    collection.update({
+        _id: hash
+    }, {
+        $set: {
+            value: hex,
+            createdAt: new Date()
+        }
+    }, {
+        upsert: true
+    }, next);
+}
+
+
+function compile(code, board, hash, done) {
     var hex;
-    var path = config.basePath + 'pioWS_' + Date.now() + Math.floor(Math.random() * (1000 - 0 + 1) + 0) + '/';
+    var path = config.basePath + 'pioWS_' + hash + '/';
     var compileErrors = [];
     exec('mkdir -p ' + path + 'src', function(error, stdout, stderr) {
         if (error) {
             console.error('exec error: ${error}');
+            console.log(error);
         } else {
             async.parallel([
                 fs.appendFile.bind(null, path + 'src/main.ino', code),
@@ -110,14 +133,12 @@ function compile(code, board, number, done) {
             ], function(err, result) {
                 if (err) {
                     console.error('exec error: ${error}');
+                    console.log(error);
                 } else {
                     var pio = spawn('pio', ['run', '-e', board, '-d', path]);
                     pio.stderr.on('data', function(data) {
-                        console.log(data);
                         compErr = errParser.parseError(data.toString('utf8'));
                         if (compErr !== []) {
-                            console.log("compErr");
-                            console.log(compErr);
                             compileErrors = compileErrors.concat(compErr);
                         }
                     });
