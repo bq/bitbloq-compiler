@@ -69,7 +69,7 @@ private:
   static char _receive_buffer[_SS_MAX_RX_BUFF];
   static volatile uint8_t _receive_buffer_tail;
   static volatile uint8_t _receive_buffer_head;
-  static SoftwareSerial *active_object;
+  static SoftwareSerialMBot *active_object;
 
   // private methods
   inline void recv() __attribute__((__always_inline__));
@@ -86,8 +86,8 @@ private:
 
 public:
   // public methods
-  SoftwareSerial(uint8_t receivePin, uint8_t transmitPin, bool inverse_logic = false);
-  ~SoftwareSerial();
+  SoftwareSerialMBot(uint8_t receivePin, uint8_t transmitPin, bool inverse_logic = false);
+  ~SoftwareSerialMBot();
   void begin(long speed);
   bool listen();
   void end();
