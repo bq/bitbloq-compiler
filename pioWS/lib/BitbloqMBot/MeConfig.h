@@ -96,7 +96,7 @@
 #include <utility/Servo.h>
 #include <utility/Wire.h>
 #include <utility/EEPROM.h>
-#include <utility/SoftwareSerialMBot.h>
+#include <utility/MBotSoftwareSerial.h>
 #include <utility/SPI.h>
 
 #define ME_PORT_DEFINED
@@ -114,3 +114,4 @@
 #endif // __AVR__
 
 #endif // MeConfig_H
+

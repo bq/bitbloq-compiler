@@ -1,6 +1,5 @@
 #include "Arduino.h"
 #include "BitbloqMBot.h"
-
 #include <MeMCore.h>
 
 
@@ -13,6 +12,8 @@ MBot::MBot(){
 }
 
 MBot::~MBot(){
+	
+	//check that all of them are not NULL pointers, delete and set to NULL
 	if (boardLeds != NULL){
 		delete boardLeds;
 		boardLeds = NULL;
@@ -21,18 +22,12 @@ MBot::~MBot(){
 		delete buzzer;
 		buzzer = NULL;
 	}
-	if (ultrasonicSensor != NULL){
-		delete ultrasonicSensor;
-		ultrasonicSensor = NULL;
-	}
+
 	if (lightSensor != NULL){
 		delete lightSensor;
 		lightSensor = NULL;
 	}
-	if (lineFollower != NULL){
-		delete lineFollower;
-		lineFollower = NULL;
-	}
+
 }
 
 void MBot::init(){
@@ -40,22 +35,22 @@ void MBot::init(){
 }
 
 void MBot::setLed(int led, int red, int green, int blue){
-    boardLeds->setColor(led, red, green, blue);
-    boardLeds->show();
+	boardLeds->setColor(led, red, green, blue);
+	boardLeds->show();
 }
 
 void MBot::tone(int note, int beat){
-    buzzer->tone(note, beat);
+	buzzer->tone(note, beat);
 }
 
 int MBot::getDistance(int port){
-	ultrasonicSensor = new MeUltrasonicSensor(port);
-	return ultrasonicSensor->distanceCm();
+	MeUltrasonicSensor ultrasonicSensor(port);
+	return ultrasonicSensor.distanceCm();
 }
 
 int MBot::getLineFollower(int port){
-	lineFollower = new MeLineFollower(port);
-	return lineFollower->readSensors();
+	MeLineFollower lineFollower(port);
+	return lineFollower.readSensors();
 }
 
 int MBot::getButtonStatus(){
@@ -70,17 +65,20 @@ void MBot::move(int direction, int speed){
 	int leftSpeed = 0;
 	int rightSpeed = 0;
 	if(direction == 1){
-		leftSpeed = speed;
+		leftSpeed = -speed; //adelante
 		rightSpeed = speed;
+		
 	}else if(direction == 2){
-		leftSpeed = -speed;
-		rightSpeed = -speed;
-	}else if(direction == 3){
-		leftSpeed = -speed;
-		rightSpeed = speed;
-	}else if(direction == 4){
 		leftSpeed = speed;
 		rightSpeed = -speed;
+		
+	}else if(direction == 3){
+		leftSpeed = -speed; //derecha
+		rightSpeed = -speed;
+	}else if(direction == 4){
+		
+		leftSpeed = speed; //inzquierda
+		rightSpeed = speed;
 	}
 	leftMotor->run(leftSpeed);
 	rightMotor->run(rightSpeed);

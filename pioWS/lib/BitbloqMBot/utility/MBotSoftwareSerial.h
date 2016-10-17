@@ -1,11 +1,11 @@
 /*
-SoftwareSerialMBot.h (formerly NewSoftSerial.h) -
+SoftwareSerial.h (formerly NewSoftSerial.h) - 
 Multi-instance software serial library for Arduino/Wiring
 -- Interrupt-driven receive and other improvements by ladyada
    (http://ladyada.net)
 -- Tuning, circular buffer, derivation from class Print/Stream,
    multi-instance support, porting to 8MHz processors,
-   various optimizations, PROGMEM delay tables, inverse logic and
+   various optimizations, PROGMEM delay tables, inverse logic and 
    direct port writing by Mikal Hart (http://www.arduiniana.org)
 -- Pin change interrupt macros by Paul Stoffregen (http://www.pjrc.com)
 -- 20MHz processor support by Garrett Mace (http://www.macetech.com)
@@ -29,8 +29,8 @@ The latest version of this library can always be found at
 http://arduiniana.org.
 */
 
-#ifndef SoftwareSerialMBot_h
-#define SoftwareSerialMBot_h
+#ifndef SoftwareSerial_h
+#define SoftwareSerial_h
 
 #include <inttypes.h>
 #include <Stream.h>
@@ -44,7 +44,7 @@ http://arduiniana.org.
 #define GCC_VERSION (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
 #endif
 
-class SoftwareSerialMBot : public Stream
+class SoftwareSerial : public Stream
 {
 private:
   // per object data
@@ -66,10 +66,10 @@ private:
   uint16_t _inverse_logic:1;
 
   // static data
-  static char _receive_buffer[_SS_MAX_RX_BUFF];
+  static char _receive_buffer[_SS_MAX_RX_BUFF]; 
   static volatile uint8_t _receive_buffer_tail;
   static volatile uint8_t _receive_buffer_head;
-  static SoftwareSerialMBot *active_object;
+  static SoftwareSerial *active_object;
 
   // private methods
   inline void recv() __attribute__((__always_inline__));
@@ -86,8 +86,8 @@ private:
 
 public:
   // public methods
-  SoftwareSerialMBot(uint8_t receivePin, uint8_t transmitPin, bool inverse_logic = false);
-  ~SoftwareSerialMBot();
+  SoftwareSerial(uint8_t receivePin, uint8_t transmitPin, bool inverse_logic = false);
+  ~SoftwareSerial();
   void begin(long speed);
   bool listen();
   void end();
@@ -101,7 +101,7 @@ public:
   virtual int available();
   virtual void flush();
   operator bool() { return true; }
-
+  
   using Print::write;
 
   // public only for easy access by interrupt handlers

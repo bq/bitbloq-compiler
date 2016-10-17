@@ -56,7 +56,7 @@
  * \param[in]
  *   None
  */
-MeSerial::MeSerial(void) : MePort(), SoftwareSerialMBot(NC, NC)
+MeSerial::MeSerial(void) : MePort(), SoftwareSerial(NC, NC)
 {
   _hard = true;
   _scratch = true;
@@ -69,7 +69,7 @@ MeSerial::MeSerial(void) : MePort(), SoftwareSerialMBot(NC, NC)
  * \param[in]
  *   port - RJ25 port from PORT_1 to M2
  */
-MeSerial::MeSerial(uint8_t port) : MePort(port), SoftwareSerialMBot(mePort[port].s2, mePort[port].s1)
+MeSerial::MeSerial(uint8_t port) : MePort(port), SoftwareSerial(mePort[port].s2, mePort[port].s1)
 {
   _scratch = false;
   _hard = false;
@@ -98,7 +98,7 @@ MeSerial::MeSerial(uint8_t port) : MePort(port), SoftwareSerialMBot(mePort[port]
  *   inverse_logic - Whether the Serial level need inv.
  */
 MeSerial::MeSerial(uint8_t receivePin, uint8_t transmitPin, bool inverse_logic)\
-                   : SoftwareSerialMBot(receivePin, transmitPin, inverse_logic)
+                   : SoftwareSerial(receivePin, transmitPin, inverse_logic)
 {
   _scratch = false;
   _hard = false;
@@ -150,8 +150,8 @@ void MeSerial::setHardware(bool mode)
  * \par Function
  *   begin
  * \par Description
- *   Sets the speed (baud rate) for the serial communication. Supported baud
- *   rates are 300, 600, 1200, 2400, 4800, 9600, 14400, 19200, 28800, 31250,
+ *   Sets the speed (baud rate) for the serial communication. Supported baud 
+ *   rates are 300, 600, 1200, 2400, 4800, 9600, 14400, 19200, 28800, 31250, 
  *   38400, 57600, and 115200.
  * \param[in]
  *   baudrate - he baud rate (long)
@@ -188,7 +188,7 @@ void MeSerial::begin(long baudrate)
   }
   else
   {
-    SoftwareSerialMBot::begin(baudrate);
+    SoftwareSerial::begin(baudrate);
   }
 }
 
@@ -229,7 +229,7 @@ void MeSerial::end(void)
   }
   else
   {
-    SoftwareSerialMBot::end();
+    SoftwareSerial::end();
   }
 }
 
@@ -237,7 +237,7 @@ void MeSerial::end(void)
  * \par Function
  *   write
  * \par Description
- *   Writes binary data to the serial port. This data is sent as a byte or series of bytes;
+ *   Writes binary data to the serial port. This data is sent as a byte or series of bytes; 
  * \param[in]
  *   byte - a value to send as a single byte
  * \par Output
@@ -272,7 +272,7 @@ size_t MeSerial::write(uint8_t byte)
   }
   else
   {
-    return (SoftwareSerialMBot::write(byte) );
+    return (SoftwareSerial::write(byte) );
   }
 }
 
@@ -280,8 +280,8 @@ size_t MeSerial::write(uint8_t byte)
  * \par Function
  *   read
  * \par Description
- *   Return a character that was received on the RX pin of the software serial port.
- *   Note that only one SoftwareSerial instance can receive incoming data at a time
+ *   Return a character that was received on the RX pin of the software serial port. 
+ *   Note that only one SoftwareSerial instance can receive incoming data at a time 
  *  (select which one with the listen() function).
  * \par Output
  *   None
@@ -321,7 +321,7 @@ int16_t MeSerial::read(void)
   }
   else
   {
-    return (SoftwareSerialMBot::read() );
+    return (SoftwareSerial::read() );
   }
 }
 
@@ -330,7 +330,7 @@ int16_t MeSerial::read(void)
  *   available
  * \par Description
  *   Get the number of bytes (characters) available for reading from a software
- *   serial port. This is data that's already arrived and stored in the serial
+ *   serial port. This is data that's already arrived and stored in the serial 
  *   receive buffer.
  * \par Output
  *   None
@@ -369,7 +369,7 @@ int16_t MeSerial::available(void)
   }
   else
   {
-    return (SoftwareSerialMBot::available() );
+    return (SoftwareSerial::available() );
   }
 }
 
@@ -378,8 +378,8 @@ int16_t MeSerial::available(void)
  *   listen
  * \par Description
  *   Enables the selected software serial port to listen, used for software serial.
- *   Only one software serial port can listen at a time; data that arrives for other
- *   ports will be discarded. Any data already received is discarded during the call
+ *   Only one software serial port can listen at a time; data that arrives for other 
+ *   ports will be discarded. Any data already received is discarded during the call 
  *   to listen() (unless the given instance is already listening).
  * \par Output
  *   None
@@ -397,7 +397,7 @@ bool MeSerial::listen(void)
   }
   else
   {
-    return (SoftwareSerialMBot::listen() );
+    return (SoftwareSerial::listen() );
   }
 }
 
@@ -421,7 +421,7 @@ bool MeSerial::isListening(void)
   }
   else
   {
-    return (SoftwareSerialMBot::isListening() );
+    return (SoftwareSerial::isListening() );
   }
 }
 
@@ -481,11 +481,11 @@ void MeSerial::sendString(char *str)
  * \par Function
  *   printf
  * \par Description
- *   Printf format string (of which "printf" stands for "print formatted")
- *   refers to a control parameter used by a class of functions in the
+ *   Printf format string (of which "printf" stands for "print formatted") 
+ *   refers to a control parameter used by a class of functions in the 
  *   string-processing libraries of various programming languages.
  * \param[in]
- *   fmt - A string that specifies the format of the output. The formatting
+ *   fmt - A string that specifies the format of the output. The formatting 
  *   string determines what additional arguments you need to provide.
  * \par Output
  *   None
