@@ -30,6 +30,9 @@ var allowCrossDomain = function(req, res, next) {
 app.use(allowCrossDomain);
 app.use(bodyParser.json());
 
+app.get('/compile', function(req, res) {
+    res.status(200).send('ok');
+});
 
 app.post('/compile', function(req, res) {
     if (req.body.code && req.body.board) {
