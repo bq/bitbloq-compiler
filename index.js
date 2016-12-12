@@ -35,7 +35,7 @@ app.get('/compile', function(req, res) {
 });
 
 app.get('/status', function(req, res) {
-    db.get().collection('status').find({},function(err, status) {
+    db.get().collection('status').find({}, function(err, status) {
         if (err) {
             console.log(err);
             err.code = parseInt(err.code) || 500;
