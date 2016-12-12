@@ -34,6 +34,17 @@ app.get('/compile', function(req, res) {
     res.status(200).send('ok');
 });
 
+app.get('/status', function(req, res) {
+    db.get().collection('status').find({}, function(err, status) {
+        if (err) {
+            console.log(err);
+            err.code = parseInt(err.code) || 500;
+            res.status(err.code).send(err);
+        } else {
+            res.status(200).send(status);
+        }
+    });
+});
 app.post('/compile', function(req, res) {
     if (req.body.code && req.body.board) {
         console.log('board:', req.body.board);
