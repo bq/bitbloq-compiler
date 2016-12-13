@@ -35,13 +35,13 @@ app.get('/compile', function(req, res) {
 });
 
 app.get('/status', function(req, res) {
-    db.get().collection('status').find({}, function(err, status) {
+    db.get().collection('status').findOne({}, function(err, appStatus) {
         if (err) {
             console.log(err);
             err.code = parseInt(err.code) || 500;
             res.status(err.code).send(err);
         } else {
-            res.status(200).send(status);
+            res.status(200).send(appStatus);
         }
     });
 });
