@@ -10,5 +10,6 @@ RUN mkdir -p /home/platformio/pioWS
 COPY pioWS /home/platformio/pioWS
 RUN python --version
 RUN sudo platformio platforms install atmelavr --with-package framework-arduinoavr
+RUN sudo mv ~/.platformio/packages  /home/platformio/pioWS
 COPY bitbloq-compiler/ /home/compiler/
 CMD node /home/compiler/index.js
