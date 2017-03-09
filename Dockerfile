@@ -8,6 +8,6 @@ RUN mkdir /home/platformio
 ENV PLATFORMIO_HOME_DIR '/home/platformio/pioWS'
 RUN mkdir -p /home/platformio/pioWS
 COPY pioWS /home/platformio/pioWS
-RUN platformio platforms install atmelavr --with-package framework-arduinoavr
+RUN pio platform install atmelavr --with-package framework-arduinoavr
 COPY bitbloq-compiler/ /home/compiler/
 CMD node /home/compiler/index.js
