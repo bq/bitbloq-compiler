@@ -1,7 +1,9 @@
 var boards = [
     'uno',
     'bt328',
-    'mega'
+    'mega',
+    'nano',
+    'leonardo'
 ];
 module.exports = {
     getBoards: boards

@@ -30,9 +30,24 @@ var allowCrossDomain = function(req, res, next) {
 app.use(allowCrossDomain);
 app.use(bodyParser.json());
 
+app.get('/compile', function(req, res) {
+    res.status(200).send('ok');
+});
 
+app.get('/status', function(req, res) {
+    db.get().collection('status').findOne({}, function(err, appStatus) {
+        if (err) {
+            console.log(err);
+            err.code = parseInt(err.code) || 500;
+            res.status(err.code).send(err);
+        } else {
+            res.status(200).send(appStatus);
+        }
+    });
+});
 app.post('/compile', function(req, res) {
     if (req.body.code && req.body.board) {
+        console.log('board:', req.body.board);
         if (utils.checkBoardType(req.body.board)) {
             var miniCode = req.body.code.replace(/(\r\n|\n|\r)/gm, '');
             var hash = crypto.createHmac('sha256', config.secret)
@@ -126,21 +141,32 @@ function compile(code, board, hash, done) {
             console.error('exec error: ${error}');
             console.log(error);
         } else {
+            console.log(refPath);
+            console.log(path);
             async.parallel([
                 fs.appendFile.bind(null, path + 'src/main.ino', code),
                 exec.bind(null, 'ln -s ' + refPath + 'platformio.ini ' + path + 'platformio.ini'),
                 exec.bind(null, 'ln -s ' + refPath + 'lib/ ' + path + 'lib')
             ], function(err, result) {
                 if (err) {
-                    console.error('exec error: ${error}');
+                    console.error('exec error: ', err);
                     console.log(error);
                 } else {
+                    console.log('hop', 'pio run -e ' + board + ' -d ' + path);
                     var pio = spawn('pio', ['run', '-e', board, '-d', path]);
                     pio.stderr.on('data', function(data) {
+                        console.log('stderror', data.toString('utf8'));
                         compErr = errParser.parseError(data.toString('utf8'));
                         if (compErr !== []) {
                             compileErrors = compileErrors.concat(compErr);
                         }
+                    });
+                    pio.stdout.on('data', function(data) {
+                        console.log('stdout', data.toString('utf8'));
+                    });
+                    pio.on('error', (err) => {
+                        console.log('Failed to start child process.', err);
+                        done(err);
                     });
                     pio.on('close', function(exitCode) {
                         if (exitCode === 0) {
@@ -173,7 +199,7 @@ function deletePath(path) {
 
 db.connect(config.mongo.uri, function(err) {
     if (err) {
-        console.log('Unable to connect to Mongo.');
+        console.log('Unable to connect to Mongo.', err);
         process.exit(1);
     } else {
         app.listen(config.port, function() {

@@ -1,32 +1,32 @@
 {
-  "name": "bitbloq-compiler",
-  "version": "1.0.0",
-  "description": "Bitbloq online compiler",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://tocalvo@github.com/bq/bitbloq-compiler.git"
-  },
-  "keywords": [
-    "bitbloq",
-    "arduino",
-    "compiler"
-  ],
-  "author": "",
-  "license": "GPL-3.0",
-  "bugs": {
-    "url": "https://github.com/bq/bitbloq-compiler/issues"
-  },
-  "homepage": "https://github.com/bq/bitbloq-compiler#readme",
-  "dependencies": {
-    "async": "^2.0.1",
-    "body-parser": "^1.15.2",
-    "crypto": "0.0.3",
-    "express": "4.14.0",
-    "mongodb": "^2.2.5",
-    "promise": "^7.1.1"
-  }
+    "name": "bitbloq-compiler",
+    "version": "1.0.1",
+    "description": "Bitbloq online compiler",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://tocalvo@github.com/bq/bitbloq-compiler.git"
+    },
+    "keywords": [
+        "bitbloq",
+        "arduino",
+        "compiler"
+    ],
+    "author": "",
+    "license": "GPL-3.0",
+    "bugs": {
+        "url": "https://github.com/bq/bitbloq-compiler/issues"
+    },
+    "homepage": "https://github.com/bq/bitbloq-compiler#readme",
+    "dependencies": {
+        "async": "^2.0.1",
+        "body-parser": "^1.15.2",
+        "crypto": "0.0.3",
+        "express": "4.14.0",
+        "mongodb": "^2.2.5",
+        "promise": "^7.1.1"
+    }
 }
