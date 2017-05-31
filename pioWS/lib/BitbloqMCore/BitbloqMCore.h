@@ -75,12 +75,14 @@ public:
              */
     int readLightSensor() const;
     
-    char getInfraredControlCommnad();
+    char getInfraredControlCommand();
     
      //ports structure of MCore Board.
     static const Port ports[5];
     
 	BitbloqMeRGBLed boardLeds;
+	
+	BitbloqIRControl* irControl; /// Remote IR Control
     
 protected:
     // void portsInit();
@@ -98,7 +100,7 @@ protected:
     const int rgbLEDPin;
     const int IRTransmitterPin; /// IR transmitter hardwired to board (D3)
     const int IRReceiverPin; /// IR receiver hardwired to board (D2)
-    BitbloqIRControl* irControl; /// Remote IR Control
+    
     
     
    

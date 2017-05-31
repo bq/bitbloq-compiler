@@ -103,9 +103,9 @@ void BitbloqFreaksCar::setup(){
     irControl->setup();
 }
 
-char BitbloqFreaksCar::getInfraredControlCommnad()
+char BitbloqFreaksCar::getInfraredControlCommand()
 {
-	return irControl->getInfraredControlCommnad();
+	return irControl->getInfraredControlCommand();
 }
 
 int BitbloqFreaksCar::readUSMeasuredDistanceCM() const{
@@ -149,8 +149,8 @@ void BitbloqFreaksCar::move(int direction, int speed){
         break;
     }
     
-    leftDCMotor->setSpeed(leftSpeed);
-    rightDCMotor->setSpeed(rightSpeed);
+    setLeftMotorSpeed(leftSpeed);
+    setRightMotorSpeed(rightSpeed);
 }
 
 void BitbloqFreaksCar::setRightMotorSpeed(int speed){
