@@ -124,7 +124,7 @@ int BitbloqFreaksCar::readLDRLeft() const{
     return analogRead(ldrLeftPin);
 }
 
-bool Evolution::getLightRange(int side, int range){
+bool BitbloqFreaksCar::getLightRange(int side, int range){
 
   int read;
 
@@ -147,7 +147,7 @@ bool Evolution::getLightRange(int side, int range){
 
   return false;
 }
-
+   
 void BitbloqFreaksCar::move(int direction, int speed){
     int leftSpeed = 0;
     int rightSpeed = 0;
