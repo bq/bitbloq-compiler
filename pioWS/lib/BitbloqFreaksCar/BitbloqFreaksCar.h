@@ -29,13 +29,21 @@
 #include <BitbloqDCMotor.h>
 #include <BitbloqIRControl.h>
 
+// Constants
+#define LOW_MEDIUM_LIGHT  267 //800*1/3
+#define MEDIUM_HIGH_LIGHT 533 //800*2/3
+
+#define LOW_LIGHT    0
+#define MEDIUM_LIGHT 1
+#define HIGH_LIGHT   2
+
 class BitbloqFreaksCar
 {
 
 public:
     BitbloqFreaksCar(); // public constructor
     virtual ~BitbloqFreaksCar(); // virtual public destructor
-    
+
 
     /**
      * Sets pinmode of sensors and actuators (as in standard Arduino setup)
@@ -53,7 +61,7 @@ public:
      * @return distance in inches
      */
     int readUSMeasuredDistanceIN() const;
-    
+
     /**
      * reading of IR with index
      * @param index IR index
@@ -63,6 +71,7 @@ public:
 
 	int readLDRLeft() const;
 	int readLDRRight() const;
+	bool getLightRange(int side, int range);
 
     void move(int direction, int speed);
     void setRightMotorSpeed(int speed);
