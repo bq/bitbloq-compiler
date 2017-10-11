@@ -20,6 +20,14 @@ void BitbloqMeRGBLed::setup(uint8_t _pin, uint8_t led_num)
   setNumber(led_num);
 }
 
+void BitbloqMeRGBLed::setup(){
+  pinMask       = digitalPinToBitMask(pin);
+  ws2812_port   = portOutputRegister(digitalPinToPort(pin) );
+  //set pinMode OUTPUT */
+  pinMode(pin, OUTPUT);
+  setNumber(count_led);
+}
+
 
 void BitbloqMeRGBLed::setNumber(uint8_t num_leds)
 {
@@ -211,6 +219,12 @@ void BitbloqMeRGBLed::show(void)
 {
   rgbled_sendarray_mask(pixels, 3 * count_led, pinMask, (uint8_t*)ws2812_port);
   delay(1);
+}
+
+void BitbloqMeRGBLed::showColor(uint8_t index, uint8_t red, uint8_t green, uint8_t blue)
+{
+  setColor(index, red, green, blue);
+  show();
 }
 
 
